@@ -3,17 +3,6 @@
 `define DATA_SIZE    32
 
 
-// Fields in Instruction Register (IR)
-`define opcode IF_ID_IR[31:26]	// 6 bits
-`define rs IF_ID_IR[25:21]		// 5 bits
-`define rt IF_ID_IR[20:16]		// 5 bits
-`define rd IF_ID_IR[15:11]		// 5 bits
-`define shamt IF_ID_IR[10:6]	// 5 bits
-`define funct IF_ID_IR[5:0]		// 6 bits
-`define imm IF_ID_IR[15:0]		// 16 bits
-`define address IF_ID_IR[25:0]	// 26 bits
-
-
 // R type - funct
 `define sll 6'd0
 `define srl 6'd2

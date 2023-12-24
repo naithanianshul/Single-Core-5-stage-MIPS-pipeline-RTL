@@ -1,7 +1,7 @@
 cd /home/runner
-export PATH=/usr/bin:/bin:/tool/pandora64/bin:/usr/share/Riviera-PRO/bin
-export RIVIERA_HOME=/usr/share/Riviera-PRO
-export CPLUS_INCLUDE_PATH=/usr/share/Riviera-PRO/interfaces/include
-export ALDEC_LICENSE_FILE=27009@10.116.0.5
+export PATH=/usr/bin:/bin:/tool/pandora64/bin:/usr/share/questa/questasim//linux_x86_64
+export CPLUS_INCLUDE_PATH=/usr/share/questa/questasim//interfaces/include
+export QUESTA_HOME=/usr/share/questa/questasim/
+export LM_LICENSE_FILE=1717@10.116.0.5
 export HOME=/home/runner
-vlib work && vlog '-timescale' '1ns/1ns' design.sv testbench.sv  && vsim -c -do "vsim +access+r; run 1ms; exit"  ; echo 'Creating result.zip...' && zip -r /tmp/tmp_zip_file_123play.zip . && mv /tmp/tmp_zip_file_123play.zip result.zip
+vlib work && vlog -writetoplevels questa.tops '-timescale' '1ns/1ns' design.sv testbench.sv  && vsim -f questa.tops -batch -do "vsim -voptargs=+acc=npr; run 1ms; exit" -voptargs=+acc=npr ; echo 'Creating result.zip...' && zip -r /tmp/tmp_zip_file_123play.zip . && mv /tmp/tmp_zip_file_123play.zip result.zip

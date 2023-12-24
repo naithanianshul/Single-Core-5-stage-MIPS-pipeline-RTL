@@ -43,20 +43,24 @@ module cpu (input clock,
   logic [`DATA_SIZE-1:0] WB_value;
 
   // Inputs for EX
+  logic [1:0] ID_EX_instruc_type;
   logic [`ADDRESS_SIZE-1:0] ID_EX_nextPC;
   logic [`ADDRESS_SIZE-1:0] ID_EX_A;
   logic [`ADDRESS_SIZE-1:0] ID_EX_B;
-  logic [`ADDRESS_SIZE-1:0] ID_EX_imm;
-  logic [`ADDRESS_SIZE-1:0] ID_EX_rd;
-  logic [`ADDRESS_SIZE-1:0] ID_EX_rt;
-  logic [`ADDRESS_SIZE-1:0] ID_EX_op;
+  logic [15:0] ID_EX_imm;
+  logic [4:0] ID_EX_rs;
+  logic [4:0] ID_EX_rt;
+  logic [4:0] ID_EX_rd;
+  logic [5:0] ID_EX_op;
 
   // Inputs for MEM
+  logic [1:0] EX_MEM_instruc_type;
   logic [5:0] EX_MEM_op;
   logic [`DATA_SIZE-1:0] EX_MEM_B;
   logic [`ADDRESS_SIZE-1:0] EX_MEM_targetPC;
 
   // Inputs for WB
+  logic [1:0] MEM_WB_instruc_type;
   logic [`DATA_SIZE-1:0] MEM_WB_result;
   logic [5:0] MEM_WB_op;  
   
@@ -87,14 +91,6 @@ module cpu (input clock,
               .IF_ID_nextPC(IF_ID_nextPC),
               .IF_ID_IR(IF_ID_IR),
               
-              .EX_MEM_valid(EX_MEM_valid),
-              .EX_MEM_dest(EX_MEM_dest),
-              .EX_MEM_result(EX_MEM_result),
-              
-              .MEM_WB_valid(MEM_WB_valid),
-              .MEM_WB_dest(MEM_WB_dest),
-              .MEM_WB_data(MEM_WB_data),
-              
               .WB_WEenable(WB_WEenable),
               .WB_dest(WB_dest),
               .WB_value(WB_value),
@@ -103,9 +99,11 @@ module cpu (input clock,
               .ID_EX_A(ID_EX_A),
               .ID_EX_B(ID_EX_B),
               .ID_EX_imm(ID_EX_imm),
+              .ID_EX_rs(ID_EX_rs),
               .ID_EX_rd(ID_EX_rd),
               .ID_EX_rt(ID_EX_rt),
               .ID_EX_op(ID_EX_op),
+              .ID_EX_instruc_type(ID_EX_instruc_type),
               
               .id_stall_c(id_stall_c)
   );
@@ -113,20 +111,33 @@ module cpu (input clock,
   // Execute (EX) Stage
   execute EX (  .clock(clock),
                 .reset_n(reset_n),
+                
                 .mem_stall_c(mem_stall_c),
+
+                .MEM_WB_valid(MEM_WB_valid),
+                .MEM_WB_dest(MEM_WB_dest),
+                .MEM_WB_result(MEM_WB_result),
+
+              	.WB_WEenable(WB_WEenable),
+                .WB_dest(WB_dest),
+                .WB_value(WB_value),
+              
                 .ID_EX_nextPC(ID_EX_nextPC),
                 .ID_EX_A(ID_EX_A),
                 .ID_EX_B(ID_EX_B),
                 .ID_EX_imm(ID_EX_imm),
+                .ID_EX_rs(ID_EX_rs),
                 .ID_EX_rd(ID_EX_rd),
                 .ID_EX_rt(ID_EX_rt),
                 .ID_EX_op(ID_EX_op),
+                .ID_EX_instruc_type(ID_EX_instruc_type),
                 .EX_MEM_valid(EX_MEM_valid),
                 .EX_MEM_dest(EX_MEM_dest),
                 .EX_MEM_result(EX_MEM_result),
                 .EX_MEM_op(EX_MEM_op),
                 .EX_MEM_B(EX_MEM_B),
                 .EX_MEM_targetPC(EX_MEM_targetPC),
+                .EX_MEM_instruc_type(EX_MEM_instruc_type),
                 .ex_stall_c(ex_stall_c)
   );
 
@@ -143,11 +154,13 @@ module cpu (input clock,
                 .EX_MEM_B(EX_MEM_B),
                 .EX_MEM_dest(EX_MEM_dest),
                 .EX_MEM_op(EX_MEM_op),
+                .EX_MEM_instruc_type(EX_MEM_instruc_type),
                 .MEM_WB_result(MEM_WB_result),
                 .MEM_WB_data(MEM_WB_data),
                 .MEM_WB_dest(MEM_WB_dest),
                 .MEM_WB_op(MEM_WB_op),
                 .MEM_WB_valid(MEM_WB_valid),
+                .MEM_WB_instruc_type(MEM_WB_instruc_type),
                 .mem_stall_c(mem_stall_c)
   );
 
@@ -158,6 +171,7 @@ module cpu (input clock,
                 .MEM_WB_data(MEM_WB_data),
                 .MEM_WB_dest(MEM_WB_dest),
                 .MEM_WB_op(MEM_WB_op),
+                .MEM_WB_instruc_type(MEM_WB_instruc_type),
                 .WB_dest(WB_dest),
                 .WB_value(WB_value),
                 .WB_WEenable(WB_WEenable)

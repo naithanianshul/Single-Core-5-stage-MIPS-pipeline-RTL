@@ -1,7 +1,7 @@
 `include "defines.vh"
 
 module fetch (	input clock,
-				        input reset_n,
+				input reset_n,
                 input id_stall_c,
                 input ex_stall_c,
                 input mem_stall_c,
@@ -9,14 +9,17 @@ module fetch (	input clock,
                 input branch_c,
                 input [`ADDRESS_SIZE-1:0] branch_pc,
 
-				        input [`DATA_SIZE-1:0] im_read_data,
-	              output logic im_write_enable,
+				input [`DATA_SIZE-1:0] im_read_data,
+				output logic im_write_enable,
                 output logic [`ADDRESS_SIZE-1:0] im_read_address,
 
                 output logic [`ADDRESS_SIZE-1:0] IF_ID_nextPC,
                 output logic [`DATA_SIZE-1:0] IF_ID_IR
 );
-  
+
+  logic [`ADDRESS_SIZE-1:0] t_IF_ID_nextPC;
+  logic [`DATA_SIZE-1:0] t_IF_ID_IR;
+
   always@(posedge clock) begin
     if (!reset_n) begin
       IF_ID_nextPC <= 32'b0;
@@ -27,12 +30,15 @@ module fetch (	input clock,
       IF_ID_IR <= IF_ID_IR;
     end
     else begin
-      IF_ID_nextPC <= IF_ID_nextPC + 1'b1;
-      IF_ID_IR = im_read_data;
+      $display("Debug IF: IF_ID_currentPC = %h, IF_ID_IR_t = %h, IF_ID_nextPC = %h", IF_ID_nextPC, t_IF_ID_IR, t_IF_ID_nextPC);
+      IF_ID_nextPC <= t_IF_ID_nextPC;
+      IF_ID_IR <= t_IF_ID_IR;
     end
-  end  
+  end
   
   assign im_write_enable = 1'b0;
   assign im_read_address = IF_ID_nextPC;
+  assign t_IF_ID_nextPC = IF_ID_nextPC + 3'b100; // PC + 4
+  assign t_IF_ID_IR = im_read_data;
   
 endmodule
