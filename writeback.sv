@@ -2,6 +2,11 @@
 
 module writeback (input clock,
                   input reset_n,
+                  
+                  input MEM_WB_sign_c,
+                  input MEM_WB_zero_c,
+                  input MEM_WB_overflow_c,
+                  input MEM_WB_carry_c,
 
                   input [`DATA_SIZE-1:0] MEM_WB_result,
                   input [`DATA_SIZE-1:0] MEM_WB_data,

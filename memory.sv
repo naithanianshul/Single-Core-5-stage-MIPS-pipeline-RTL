@@ -8,6 +8,11 @@ module memory ( input clock,
                 output logic [`ADDRESS_SIZE-1:0]  dm_write_address,
                 output logic [`DATA_SIZE-1:0]     dm_write_data,
                 output logic [`ADDRESS_SIZE-1:0]  dm_read_address,
+               
+                input EX_MEM_sign_c,
+                input EX_MEM_zero_c,
+                input EX_MEM_overflow_c,
+                input EX_MEM_carry_c,
                 
                 input [`ADDRESS_SIZE-1:0] EX_MEM_targetPC,
                 input [`DATA_SIZE-1:0] EX_MEM_result,
@@ -15,6 +20,11 @@ module memory ( input clock,
                 input [4:0] EX_MEM_dest,
                 input [5:0] EX_MEM_op,
                 input [1:0] EX_MEM_instruc_type,
+               
+                output logic MEM_WB_sign_c,
+                output logic MEM_WB_zero_c,
+                output logic MEM_WB_overflow_c,
+                output logic MEM_WB_carry_c,
 
                 output logic [`DATA_SIZE-1:0] MEM_WB_result,
                 output logic [`DATA_SIZE-1:0] MEM_WB_data,
@@ -30,6 +40,11 @@ module memory ( input clock,
   
   always@(posedge clock) begin
     if (!reset_n) begin
+      MEM_WB_sign_c <= 1'b0;
+      MEM_WB_zero_c <= 1'b0;
+      MEM_WB_overflow_c <= 1'b0;
+      MEM_WB_carry_c <= 1'b0;
+      
       MEM_WB_result <= 32'b0;
       MEM_WB_data <= 32'b0;
       MEM_WB_dest <= 5'b0;
@@ -39,6 +54,11 @@ module memory ( input clock,
       mem_stall_c <= 1'b0;
     end
     else begin
+      MEM_WB_sign_c <= EX_MEM_sign_c;
+      MEM_WB_zero_c <= EX_MEM_zero_c;
+      MEM_WB_overflow_c <= EX_MEM_zero_c;
+      MEM_WB_carry_c <= EX_MEM_zero_c;
+      
       MEM_WB_result <= EX_MEM_result;
       MEM_WB_data <= t_MEM_WB_data;
       MEM_WB_dest <= EX_MEM_dest;

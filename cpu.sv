@@ -57,11 +57,19 @@ module cpu (input clock,
   logic [5:0] ID_EX_op;
 
   // Inputs for MEM
+  logic EX_MEM_sign_c;
+  logic EX_MEM_zero_c;
+  logic EX_MEM_overflow_c;
+  logic EX_MEM_carry_c;
   logic [1:0] EX_MEM_instruc_type;
   logic [5:0] EX_MEM_op;
   logic [`DATA_SIZE-1:0] EX_MEM_B;
   
   // Inputs for WB
+  logic MEM_WB_sign_c;
+  logic MEM_WB_zero_c;
+  logic MEM_WB_overflow_c;
+  logic MEM_WB_carry_c;
   logic [1:0] MEM_WB_instruc_type;
   logic [`DATA_SIZE-1:0] MEM_WB_result;
   logic [5:0] MEM_WB_op;  
@@ -139,6 +147,10 @@ module cpu (input clock,
               .ID_EX_rt(ID_EX_rt),
               .ID_EX_op(ID_EX_op),
               .ID_EX_instruc_type(ID_EX_instruc_type),
+              .EX_MEM_sign_c(EX_MEM_sign_c),
+              .EX_MEM_zero_c(EX_MEM_zero_c),
+              .EX_MEM_overflow_c(EX_MEM_overflow_c),
+              .EX_MEM_carry_c(EX_MEM_carry_c),
               .EX_MEM_valid(EX_MEM_valid),
               .EX_MEM_dest(EX_MEM_dest),
               .EX_MEM_result(EX_MEM_result),
@@ -158,12 +170,20 @@ module cpu (input clock,
               .dm_write_address(dm_write_address),
               .dm_write_data(dm_write_data),
               .dm_read_address(dm_read_address),
+              .EX_MEM_sign_c(EX_MEM_sign_c),
+              .EX_MEM_zero_c(EX_MEM_zero_c),
+              .EX_MEM_overflow_c(EX_MEM_overflow_c),
+              .EX_MEM_carry_c(EX_MEM_carry_c),
               .EX_MEM_targetPC(EX_MEM_targetPC),
               .EX_MEM_result(EX_MEM_result),
               .EX_MEM_B(EX_MEM_B),
               .EX_MEM_dest(EX_MEM_dest),
               .EX_MEM_op(EX_MEM_op),
               .EX_MEM_instruc_type(EX_MEM_instruc_type),
+              .MEM_WB_sign_c(MEM_WB_sign_c),
+              .MEM_WB_zero_c(MEM_WB_zero_c),
+              .MEM_WB_overflow_c(MEM_WB_overflow_c),
+              .MEM_WB_carry_c(MEM_WB_carry_c),
               .MEM_WB_result(MEM_WB_result),
               .MEM_WB_data(MEM_WB_data),
               .MEM_WB_dest(MEM_WB_dest),
@@ -176,6 +196,10 @@ module cpu (input clock,
   // Writeback (WB) Stage
   writeback WB (.clock(clock),
                 .reset_n(reset_n),
+                .MEM_WB_sign_c(MEM_WB_sign_c),
+                .MEM_WB_zero_c(MEM_WB_zero_c),
+                .MEM_WB_overflow_c(MEM_WB_overflow_c),
+                .MEM_WB_carry_c(MEM_WB_carry_c),
                 .MEM_WB_result(MEM_WB_result),
                 .MEM_WB_data(MEM_WB_data),
                 .MEM_WB_dest(MEM_WB_dest),
