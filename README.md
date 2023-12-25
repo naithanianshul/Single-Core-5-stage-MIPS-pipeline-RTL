@@ -8,3 +8,6 @@ This processor supports the following instructions:
 | I    | lui, ori, sw, lw, beq |
 | J    | j                     |
 
+This project also implements Data Forwarding to avoid pipeline stalls due to Read-After-Write (RAW) hazards
+
+The Core CPU module assumes that the Instruction Memory and Data Memory are both Byte addressable and Reads/Writes can be performed in a single cycle
