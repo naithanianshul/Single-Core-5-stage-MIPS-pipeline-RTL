@@ -51,6 +51,7 @@ module memory ( input clock,
     end
   end
   
+  
   always@(*) begin
     dm_write_enable <= 1'b0;
     // MEM Instruc Ops

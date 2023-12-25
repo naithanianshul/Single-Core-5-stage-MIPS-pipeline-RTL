@@ -22,6 +22,7 @@ module execute (input clock,
                 input [5:0] ID_EX_op,	// 6 bits (from IR)
                 input [1:0] ID_EX_instruc_type,
                 
+                output logic EX_MEM_changePC_c,
                 output logic [`ADDRESS_SIZE-1:0] EX_MEM_targetPC,
                 output logic [`DATA_SIZE-1:0] EX_MEM_result,
                 output logic [`DATA_SIZE-1:0] EX_MEM_B,
@@ -47,12 +48,13 @@ module execute (input clock,
   assign t_EX_MEM_valid = (ID_EX_instruc_type != 2'b00);
   
   always@(posedge clock) begin
-    if (!reset_n) begin
+    if (~reset_n | EX_MEM_changePC_c) begin
 	  EX_MEM_dest <= 5'b0;
       EX_MEM_result <= 32'b0;
       EX_MEM_op <= 6'b0;
       EX_MEM_B <= 32'b0;
       EX_MEM_instruc_type <= 2'b0;
+      EX_MEM_changePC_c <= 1'b0;
       EX_MEM_targetPC <= 32'b0;
       EX_MEM_valid <= 1'b0;
     end
@@ -62,6 +64,7 @@ module execute (input clock,
       EX_MEM_op <= EX_MEM_op;
       EX_MEM_B <= EX_MEM_B;
       EX_MEM_instruc_type <= EX_MEM_instruc_type;
+      EX_MEM_changePC_c <= EX_MEM_changePC_c;
       EX_MEM_targetPC <= EX_MEM_targetPC;
       EX_MEM_valid <= EX_MEM_valid;
     end
@@ -69,6 +72,7 @@ module execute (input clock,
       if (valid_rd) EX_MEM_dest <= ID_EX_rd;
       else EX_MEM_dest <= ID_EX_rt;
       
+      EX_MEM_changePC_c <= 1'b0;
       // ALU Instruc Ops
       case (ID_EX_op)
         `lui: begin
@@ -87,18 +91,34 @@ module execute (input clock,
         end
         
         `lw: begin
-          EX_MEM_result <= t_A + {{16{ID_EX_imm[15]}}, ID_EX_imm};
+          EX_MEM_result <= t_A + { {16{ID_EX_imm[15]}}, ID_EX_imm };
           EX_MEM_targetPC <= ID_EX_nextPC;
         end
         
         `sw: begin
-          EX_MEM_result <= t_A + {{16{ID_EX_imm[15]}}, ID_EX_imm};
+          EX_MEM_result <= t_A + { {16{ID_EX_imm[15]}}, ID_EX_imm };
           EX_MEM_targetPC <= ID_EX_nextPC;
         end
 
         `j_inst: begin
           EX_MEM_result <= 32'b0;
+          EX_MEM_changePC_c <= 1'b1;
           EX_MEM_targetPC <= {ID_EX_nextPC[31:28], {ID_EX_rs,ID_EX_rt,ID_EX_imm}, 2'b00};
+          $display("Debug EX: Jump to EX_MEM_targetPC = %h", {ID_EX_nextPC[31:28], {ID_EX_rs,ID_EX_rt,ID_EX_imm}, 2'b00});
+        end
+        
+        `beq: begin
+          EX_MEM_result <= 32'b0;
+          $display("Debug EX: beq - ID_EX_A = %h, ID_EX_B = %h", t_A, t_B);
+          if (t_A == t_B) begin
+          	EX_MEM_changePC_c <= 1'b1;
+            EX_MEM_targetPC <= ID_EX_nextPC + { {14{ID_EX_imm[15]}}, ID_EX_imm, 2'b00 };
+            $display("Debug EX: Jump to EX_MEM_targetPC = %h based on ID_EX_nextPC = %h and ID_EX_imm = %h", ID_EX_nextPC + { {14{ID_EX_imm[15]}}, ID_EX_imm, 2'b00 }, ID_EX_nextPC, ID_EX_imm);
+          end
+          else begin
+            EX_MEM_changePC_c <= 1'b0;
+          	EX_MEM_targetPC <= ID_EX_nextPC;
+          end
         end
 
         default: begin

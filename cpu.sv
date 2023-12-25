@@ -30,6 +30,9 @@ module cpu (input clock,
   logic [`ADDRESS_SIZE-1:0] branch_pc;
   logic [`ADDRESS_SIZE-1:0] IF_ID_nextPC;
   logic [`DATA_SIZE-1:0] IF_ID_IR;
+  logic EX_MEM_changePC_c;
+  logic [`ADDRESS_SIZE-1:0] EX_MEM_targetPC;
+
   
   // Inputs for ID
   logic EX_MEM_valid;
@@ -57,29 +60,32 @@ module cpu (input clock,
   logic [1:0] EX_MEM_instruc_type;
   logic [5:0] EX_MEM_op;
   logic [`DATA_SIZE-1:0] EX_MEM_B;
-  logic [`ADDRESS_SIZE-1:0] EX_MEM_targetPC;
-
+  
   // Inputs for WB
   logic [1:0] MEM_WB_instruc_type;
   logic [`DATA_SIZE-1:0] MEM_WB_result;
   logic [5:0] MEM_WB_op;  
   
+  
   // Instruction Fetch (IF) Stage
-  fetch IF (  .clock(clock),
-              .reset_n(reset_n),
-              .id_stall_c(id_stall_c),
-              .ex_stall_c(ex_stall_c),
-              .mem_stall_c(mem_stall_c),
+  fetch IF (.clock(clock),
+            .reset_n(reset_n),
+            .id_stall_c(id_stall_c),
+            .ex_stall_c(ex_stall_c),
+            .mem_stall_c(mem_stall_c),
 
-              .branch_c(branch_c),
-              .branch_pc(branch_pc),
+            .branch_c(branch_c),
+            .branch_pc(branch_pc),
 
-              .im_read_data(im_read_data),
-              .im_write_enable(im_write_enable),
-              .im_read_address(im_read_address),
+            .im_read_data(im_read_data),
+            .im_write_enable(im_write_enable),
+            .im_read_address(im_read_address),
 
-              .IF_ID_nextPC(IF_ID_nextPC),
-              .IF_ID_IR(IF_ID_IR)
+            .IF_ID_nextPC(IF_ID_nextPC),
+            .IF_ID_IR(IF_ID_IR),
+
+            .EX_MEM_changePC_c(EX_MEM_changePC_c),
+            .EX_MEM_targetPC(EX_MEM_targetPC)
   );
   
   // Instruction Decode (ID) Stage
@@ -87,6 +93,8 @@ module cpu (input clock,
               .reset_n(reset_n),
               .ex_stall_c(ex_stall_c),
               .mem_stall_c(mem_stall_c),
+             
+              .EX_MEM_changePC_c(EX_MEM_changePC_c),
               
               .IF_ID_nextPC(IF_ID_nextPC),
               .IF_ID_IR(IF_ID_IR),
@@ -109,59 +117,60 @@ module cpu (input clock,
   );
   
   // Execute (EX) Stage
-  execute EX (  .clock(clock),
-                .reset_n(reset_n),
-                
-                .mem_stall_c(mem_stall_c),
+  execute EX (.clock(clock),
+              .reset_n(reset_n),
 
-                .MEM_WB_valid(MEM_WB_valid),
-                .MEM_WB_dest(MEM_WB_dest),
-                .MEM_WB_result(MEM_WB_result),
+              .mem_stall_c(mem_stall_c),
 
-              	.WB_WEenable(WB_WEenable),
-                .WB_dest(WB_dest),
-                .WB_value(WB_value),
-              
-                .ID_EX_nextPC(ID_EX_nextPC),
-                .ID_EX_A(ID_EX_A),
-                .ID_EX_B(ID_EX_B),
-                .ID_EX_imm(ID_EX_imm),
-                .ID_EX_rs(ID_EX_rs),
-                .ID_EX_rd(ID_EX_rd),
-                .ID_EX_rt(ID_EX_rt),
-                .ID_EX_op(ID_EX_op),
-                .ID_EX_instruc_type(ID_EX_instruc_type),
-                .EX_MEM_valid(EX_MEM_valid),
-                .EX_MEM_dest(EX_MEM_dest),
-                .EX_MEM_result(EX_MEM_result),
-                .EX_MEM_op(EX_MEM_op),
-                .EX_MEM_B(EX_MEM_B),
-                .EX_MEM_targetPC(EX_MEM_targetPC),
-                .EX_MEM_instruc_type(EX_MEM_instruc_type),
-                .ex_stall_c(ex_stall_c)
+              .MEM_WB_valid(MEM_WB_valid),
+              .MEM_WB_dest(MEM_WB_dest),
+              .MEM_WB_result(MEM_WB_result),
+
+              .WB_WEenable(WB_WEenable),
+              .WB_dest(WB_dest),
+              .WB_value(WB_value),
+
+              .ID_EX_nextPC(ID_EX_nextPC),
+              .ID_EX_A(ID_EX_A),
+              .ID_EX_B(ID_EX_B),
+              .ID_EX_imm(ID_EX_imm),
+              .ID_EX_rs(ID_EX_rs),
+              .ID_EX_rd(ID_EX_rd),
+              .ID_EX_rt(ID_EX_rt),
+              .ID_EX_op(ID_EX_op),
+              .ID_EX_instruc_type(ID_EX_instruc_type),
+              .EX_MEM_valid(EX_MEM_valid),
+              .EX_MEM_dest(EX_MEM_dest),
+              .EX_MEM_result(EX_MEM_result),
+              .EX_MEM_op(EX_MEM_op),
+              .EX_MEM_B(EX_MEM_B),
+              .EX_MEM_changePC_c(EX_MEM_changePC_c),
+              .EX_MEM_targetPC(EX_MEM_targetPC),
+              .EX_MEM_instruc_type(EX_MEM_instruc_type),
+              .ex_stall_c(ex_stall_c)
   );
 
   // Memory (MEM) Stage
-  memory MEM (  .clock(clock),
-                .reset_n(reset_n),
-                .dm_read_data(dm_read_data),
-              	.dm_write_enable(dm_write_enable),
-                .dm_write_address(dm_write_address),
-                .dm_write_data(dm_write_data),
-                .dm_read_address(dm_read_address),
-                .EX_MEM_targetPC(EX_MEM_targetPC),
-                .EX_MEM_result(EX_MEM_result),
-                .EX_MEM_B(EX_MEM_B),
-                .EX_MEM_dest(EX_MEM_dest),
-                .EX_MEM_op(EX_MEM_op),
-                .EX_MEM_instruc_type(EX_MEM_instruc_type),
-                .MEM_WB_result(MEM_WB_result),
-                .MEM_WB_data(MEM_WB_data),
-                .MEM_WB_dest(MEM_WB_dest),
-                .MEM_WB_op(MEM_WB_op),
-                .MEM_WB_valid(MEM_WB_valid),
-                .MEM_WB_instruc_type(MEM_WB_instruc_type),
-                .mem_stall_c(mem_stall_c)
+  memory MEM (.clock(clock),
+              .reset_n(reset_n),
+              .dm_read_data(dm_read_data),
+              .dm_write_enable(dm_write_enable),
+              .dm_write_address(dm_write_address),
+              .dm_write_data(dm_write_data),
+              .dm_read_address(dm_read_address),
+              .EX_MEM_targetPC(EX_MEM_targetPC),
+              .EX_MEM_result(EX_MEM_result),
+              .EX_MEM_B(EX_MEM_B),
+              .EX_MEM_dest(EX_MEM_dest),
+              .EX_MEM_op(EX_MEM_op),
+              .EX_MEM_instruc_type(EX_MEM_instruc_type),
+              .MEM_WB_result(MEM_WB_result),
+              .MEM_WB_data(MEM_WB_data),
+              .MEM_WB_dest(MEM_WB_dest),
+              .MEM_WB_op(MEM_WB_op),
+              .MEM_WB_valid(MEM_WB_valid),
+              .MEM_WB_instruc_type(MEM_WB_instruc_type),
+              .mem_stall_c(mem_stall_c)
   );
 
   // Writeback (WB) Stage

@@ -8,6 +8,10 @@ module fetch (	input clock,
 
                 input branch_c,
                 input [`ADDRESS_SIZE-1:0] branch_pc,
+              
+              	input EX_MEM_changePC_c,
+                input [`ADDRESS_SIZE-1:0] EX_MEM_targetPC,
+
 
 				input [`DATA_SIZE-1:0] im_read_data,
 				output logic im_write_enable,
@@ -17,6 +21,7 @@ module fetch (	input clock,
                 output logic [`DATA_SIZE-1:0] IF_ID_IR
 );
 
+  logic [`ADDRESS_SIZE-1:0] t_IF_ID_currentPC;
   logic [`ADDRESS_SIZE-1:0] t_IF_ID_nextPC;
   logic [`DATA_SIZE-1:0] t_IF_ID_IR;
 
@@ -36,9 +41,23 @@ module fetch (	input clock,
     end
   end
   
+  
   assign im_write_enable = 1'b0;
-  assign im_read_address = IF_ID_nextPC;
-  assign t_IF_ID_nextPC = IF_ID_nextPC + 3'b100; // PC + 4
-  assign t_IF_ID_IR = im_read_data;
+  always@(*) begin
+    t_IF_ID_IR <= im_read_data;
+    
+    if (EX_MEM_changePC_c) begin
+      t_IF_ID_currentPC = EX_MEM_targetPC;
+      im_read_address <= EX_MEM_targetPC;
+      $display("Debug IF: Jump to EX_MEM_targetPC = %h", EX_MEM_targetPC);
+    end
+    else begin
+      t_IF_ID_currentPC = IF_ID_nextPC;
+      im_read_address <= IF_ID_nextPC;
+    end
+    
+    t_IF_ID_nextPC = t_IF_ID_currentPC + 3'b100;
+    
+  end
   
 endmodule

@@ -15,6 +15,8 @@ module decode (	input clock,
                 input ex_stall_c,
                 input mem_stall_c,
                
+                input EX_MEM_changePC_c,
+               
                 input WB_WEenable,
                 input [4:0] WB_dest,
                 input [`DATA_SIZE-1:0] WB_value,
@@ -46,7 +48,7 @@ module decode (	input clock,
   integer i;
   
   always@(posedge clock) begin
-    if (!reset_n) begin
+    if (~reset_n || EX_MEM_changePC_c) begin
       /*for (i = 0; i < 32; i = i + 1) begin
         RF[i] = 32'b0;
       end*/
@@ -88,7 +90,7 @@ module decode (	input clock,
         $display("Debug ID: WB result is written back WB_dest = %h, WB_value = %h", WB_dest, WB_value);
       end
       
-      ID_EX_nextPC <= ID_EX_nextPC;
+      ID_EX_nextPC <= IF_ID_nextPC;
       
 	  ID_EX_A <= t_ID_EX_A;
       ID_EX_B <= t_ID_EX_B;
@@ -101,6 +103,7 @@ module decode (	input clock,
       ID_EX_instruc_type <= t_ID_EX_instruc_type;
     end
   end
+  
   
   always @(*) begin
     // id_stall //
