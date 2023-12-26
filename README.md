@@ -13,3 +13,6 @@ This processor supports the following instructions:
 | J    | j                     |
 
 This project also implements Data Forwarding to avoid pipeline stalls due to Read-After-Write (RAW) hazards
+
+The modules for CPU, Instruction Memory, and Data Memory are interfaced as shown below
+![mips32 drawio](https://github.com/naithanianshul/Single-Core-5-stage-MIPS-pipeline-RTL/assets/39558258/c4d56925-aa66-485e-9f86-60a71ee3ffbd)
