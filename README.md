@@ -19,5 +19,4 @@ The modules for CPU, Instruction Memory, and Data Memory are interfaced as shown
 ![mips32 drawio](https://github.com/naithanianshul/Single-Core-5-stage-MIPS-pipeline-RTL/assets/39558258/8c546584-1cf4-49d3-9a02-682e5de5594a)
 
 The implemented design is as follows:
-
-<img width="759" alt="Screenshot 2023-12-19 at 16 27 29" src="https://github.com/naithanianshul/Single-Core-5-stage-MIPS-pipeline-RTL/assets/39558258/b839218b-2163-4f1a-a05d-bc7429ee2757">
+<img width="759" alt="Screenshot 2023-12-19 at 16 27 29" src="https://github.com/naithanianshul/Single-Core-5-stage-MIPS-pipeline-RTL/assets/39558258/1179c23e-e9e5-461a-86e3-e7e6f7a5b550">
