@@ -17,3 +17,6 @@ This project also implements Data Forwarding to avoid pipeline stalls due to Rea
 The CPU module in this project does not have a Instruction Cache or Data Cache. The memory is connected externally to the core.
 The modules for CPU, Instruction Memory, and Data Memory are interfaced as shown below
 ![mips32 drawio](https://github.com/naithanianshul/Single-Core-5-stage-MIPS-pipeline-RTL/assets/39558258/8c546584-1cf4-49d3-9a02-682e5de5594a)
+
+The implemented design is as follows:
+<img width="759" alt="Screenshot 2023-12-19 at 16 27 29" src="https://github.com/naithanianshul/Single-Core-5-stage-MIPS-pipeline-RTL/assets/39558258/1f8d18a7-8e0c-4a65-9b05-3709aefa252e">
